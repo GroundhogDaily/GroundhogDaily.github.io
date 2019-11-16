@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://GroundhogDaily.github.io</id>
     <title>笔记</title>
-    <updated>2019-11-10T09:01:50.678Z</updated>
+    <updated>2019-11-16T01:31:13.557Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://GroundhogDaily.github.io"/>
     <link rel="self" href="https://GroundhogDaily.github.io/atom.xml"/>
@@ -10,6 +10,265 @@
     <logo>https://GroundhogDaily.github.io/images/avatar.png</logo>
     <icon>https://GroundhogDaily.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 笔记</rights>
+    <entry>
+        <title type="html"><![CDATA[Java多线程基础]]></title>
+        <id>https://GroundhogDaily.github.io/post/java-duo-xian-cheng-ji-chu</id>
+        <link href="https://GroundhogDaily.github.io/post/java-duo-xian-cheng-ji-chu">
+        </link>
+        <updated>2019-11-16T01:28:57.000Z</updated>
+        <content type="html"><![CDATA[<h4 id="使用多线程的方法">使用多线程的方法</h4>
+<p>继承Thread类</p>
+<p>实现runnable接口</p>
+<h4 id="线程常用方法thread类和object类">线程常用方法(Thread类和Object类)</h4>
+<p>这些方法要注意当前线程和该线程表述，当前线程即正在执行该代码段的线程，该线程指调用该方法的那个线程。</p>
+<p>一般静态Thread方法调用是调用当前正在执行的线程，直接通过类名调用即可。</p>
+<pre><code class="language-java">static Thread currentThread();
+Thread.currentThread().getName()
+</code></pre>
+<p>返回当前正在执行的线程名，currentThread()是返回当前正在执行的线程。</p>
+<pre><code class="language-java">boolean isAlive()
+</code></pre>
+<p>判断该线程是否是否处于活跃状态，即正在运行或准备运行的状态。</p>
+<pre><code class="language-java">static void sleep(long millis)
+</code></pre>
+<p>在指定的毫秒数内让当前正在执行的线程休眠，该方法不会让线程释放锁。</p>
+<pre><code class="language-java">long getId()
+</code></pre>
+<p>返回该线程的标识符，线程ID唯一不变，线程终止时，该线程ID可以被重新使用。</p>
+<pre><code class="language-java">void interrupt()
+</code></pre>
+<p>中断线程，该方法不会使正在运行的线程停止，只是改变中断标志，而对于改变了中断标志的线程，调用wait，sleep，join方法时会抛出异常。如果线程在调用 Object 类的 wait()、wait(long) 或 wait(long, int) 方法，或者该类的 join()、join(long)、join(long, int)、sleep(long) 或 sleep(long, int) 方法过程中受阻，则其中断状态将被清除，它还将收到一个 InterruptedException。</p>
+<p>该方法主要作用是让处于wait，sleep，join状态的线程退出，让线程提早结束。但会抛出异常（中断状态也会被清除），后面的语句也不再执行，如果有需要，可以在catch语句块中编写要执行的代码。</p>
+<pre><code class="language-java">static boolean interrupted()
+</code></pre>
+<p>判断当前正在执行的线程是否处于中断状态，并清除中断状态，可以与interrupt方法一起使用使线程停止（抛出异常的方式或return）。</p>
+<p>interrupt方法可以在其他地方通过线程引用调用设置中断，在该线程执行时即可判断是否中断并作出响应。</p>
+<pre><code class="language-java">boolean isInterrupted()
+</code></pre>
+<p>测试线程是否已经中断，不改变中断状态。</p>
+<pre><code class="language-java">static void yield()
+</code></pre>
+<p>暂停当前正在执行的线程对象，并执行其他线程。即让出cpu资源，并处于就绪状态等待cpu资源。</p>
+<pre><code class="language-java">final void setPriority(int newPriority)
+
+</code></pre>
+<p>更改线程的优先级（1-10）。</p>
+<p>在Java中，线程优先级具有继承性，比如A线程启动B线程，则B线程的优先级与A是一样的。</p>
+<pre><code class="language-java">final int getPriority()
+
+</code></pre>
+<p>返回线程的优先级。</p>
+<pre><code class="language-java">final void join()
+
+</code></pre>
+<p>等待该线程终止，并释放锁。</p>
+<pre><code class="language-java">final wait void wait()
+
+</code></pre>
+<p>Object方法，使线程等待，将线程加入“预执行队列”中，并释放锁，只能在同步语句块中使用。</p>
+<p>为防止出现通知过早等问题，该方法需要在循环中使用，一般用while语句加上标识符。</p>
+<pre><code class="language-java">final void notify()
+
+</code></pre>
+<p>Object方法，唤醒在此对象监视器上等待的单个线程（随机唤醒一个），被唤醒的线程加入就绪队列，等待当前线程释放锁，必须在同步语句块中使用，</p>
+<pre><code class="language-java">final void notifyAll()
+
+</code></pre>
+<p>Object方法，唤醒在此对象监视器上等待的所有线程，必须在同步语句块中使用。</p>
+<p>上述三个方法可以实现线程间通信的功能，生产者与消费者则需用到notifyAll唤醒所有等待的线程，否则会产生循环等待的问题，即生产者唤醒生产者，消费者唤醒消费者。</p>
+<h4 id="生产者和消费者模型">生产者和消费者模型</h4>
+<pre><code class="language-java">/*
+简述：由生产者和消费者共同维护一个缓冲区，生产者负责向缓冲区添加消息，消费者从缓冲区消费消息，生产者和消费者线程通过缓冲区进行单向通信。
+使用wait/notifyAll实现的模型，同一时间只有一个线程操作缓冲区（wait/notifyAll都要在同步块中使用），这里唤醒和等待都要基于同一个锁对象才有意义。
+*/
+class Person{
+	private int foodNum = 0;//缓冲区
+    private Object synObj = new Object();//锁对象
+    Private final int MAX_NUM = 10;//缓冲区大小
+    
+    在wait时中断抛出异常
+    public void produce() throws InterruptedException{
+        synchronized(synObj){
+            //这里必须用while，如果出现生产者唤醒生产者这种情况，则继续等待，下面consume同理
+            while(foodNum == MAX_NUM){
+                synObj.wait();
+            }
+            foodNum ++;//生产消息
+            synObj.notifyAll();//唤醒所有线程，也必须使用该方法唤醒所有等待线程
+        }
+    }
+    
+    public void consume() throws InterruptedException{
+        synchronized(synObj){
+            while(foodNum == 0){
+                synObj.wait();
+            }
+            foodNum--;//消费消息
+            synObj.notifyAll();
+        }
+    }	
+}
+
+class Producer implements Runnable{
+	Person person ;
+    
+    public Producer(Person person){
+        this.person = person;
+    }
+    
+    public void run(){
+        while(true){//根据具体业务而定
+            //发生中断时会抛出异常，提前结束等待（调用interrupt方法，中断当前线程），所以需要     		   //在出现这种情况时进行相应的处理，有时候业务需要提前结束等待。
+            try{
+            	person.produce();
+        	}catch(InterruptedException e){
+            	e.printStackTrace();
+       		}
+        }
+    }
+}
+
+class Consumer implements Runnable{
+    Person person;
+    
+    public Consumer(Person person){
+        this.person = person;
+    }
+    
+    public void run(){
+        while(true){
+            try{
+            	person.consume();
+        	}catch(InterruptedException e){
+            	e.printStackTrace();
+       		}
+        }
+    }
+}
+
+</code></pre>
+<h4 id="通过管道进行线程间通信">通过管道进行线程间通信</h4>
+<pre><code class="language-Java">PipedInputStream（从输入流中读取数据） PipedOutputStream //字节流
+PipedReader PipedWriter //字符流
+//四个类都有connect方法，用于相互连接，一个线程通过PipedOutputStream或PipedWriter向流输入数据，另一个线程取数据
+//管道输入流包含一个缓冲区，可在缓冲区限定的范围内将读操作和写操作分离开。
+
+</code></pre>
+<h4 id="lock的使用显式锁">Lock的使用(显式锁)</h4>
+<h5 id="reentrantlock">ReentrantLock</h5>
+<pre><code class="language-Java">/*
+ReentrantLock:一个可重入的互斥锁 Lock，它具有与使用 synchronized 方法和语句所访问的隐式监视器锁相同的一些基本行为和语义，但功能更强大。 
+*/
+//典型代码
+public class Demo{
+    private final Lock lock = new ReentrantLock();
+    public void test(){
+        lock.lock();
+        //lock获取锁后运行代码，当抛出异常时不像synchronized一样，自动释放锁，所以需要try语句保证最后能释放锁，不然会有死锁的可能。
+        try{
+            //do something ...
+        }finally{
+            lock.unlock();
+        }
+    }
+}
+
+</code></pre>
+<h4 id="与lock关联的condition">与Lock关联的Condition</h4>
+<p>理解：conditon通过lock.newCondition()创建，实现了粒度更细的等待/通知模型。一个Lock对象可以创建多个Condition,而一个Condition可以和多个线程关联，实现了范围性的等待/通知。</p>
+<p>线程执行到condition.await()时等待并释放锁，另一个线程通过condition.signal()/condition.signalAll()唤醒同一个condition内等待的线程。一个condition即为一个条件队列，通过调用不同的condition即可唤醒不同的条件队列等待的线程。</p>
+<pre><code class="language-java">public class demo{
+	private final Lock lock = new ReetrantLock();
+    private Condition conditon1 = lock.newConditon();
+    private Condition condition2 = lock.newConditon();
+    
+    public void await1(){
+        lock.lock();
+        try{
+            do something ...
+            condition1.await();
+            do something ...
+        }catch(InterruptedException e){
+            e.prinStackTrace();
+        }finally{
+            lock.unlock();
+        }
+    }
+    
+    public void await2(){
+        lock.lock();
+        try{
+            do something ...
+            condition12.await();
+            do something ...
+        }catch(InterruptedException e){
+            e.prinStackTrace();
+        }finally{
+            lock.unlock();
+        }
+    }
+    
+    public void signal1(){
+        lock.lock();
+        try{
+            do something ...
+            condition11.signalAll();
+            do something ...
+        }finally{
+            lock.unlock();
+        }
+    }
+    
+     public void signal2(){
+        lock.lock();
+        try{
+            do something ...
+            condition12.signalAll();
+            do something ...
+        }finally{
+            lock.unlock();
+        }
+    }
+}
+
+</code></pre>
+<h5 id="公平锁和非公平锁">公平锁和非公平锁</h5>
+<p>锁Lock分为“公平锁”和“非公平锁”，公平锁表示线程获取锁的顺序是按照FIFO先进先出的顺序，非公平锁则是一种获取锁的抢占机制，随机获取锁。</p>
+<pre><code class="language-java">lock = new ReentrantLock(true)//设为公平锁，默认为false
+
+</code></pre>
+<h5 id="有条件的执行线程">有条件的执行线程</h5>
+<pre><code class="language-java"> boolean tryLock()
+
+</code></pre>
+<p>仅在调用时锁未被另一个线程保持的情况下，才获取该锁。 如果锁被另一个线程保持，则此方法将立即返回 false 值。 与lock()不同的是，他不会等待获取锁，而是直接返回false。</p>
+<pre><code class="language-java">boolean tryLock(long timeout,TimeUnit unit) throws InterruptedException
+
+</code></pre>
+<p>如果锁在给定等待时间内没有被另一个线程保持，且当前线程未被中断，则获取该锁。</p>
+<p>因为此方法是一个显式中断点，所以要优先考虑响应中断，而不是响应锁的普通获取或重入获取，或者报告所用的等待时间。</p>
+<p>理解：lock锁可实现有条件，有时间限制的获取锁，在中断情况下放弃执行后面的同步代码块，并抛出异常，在实现时可通过设置中断有条件的让一个线程是否执行同步代码。</p>
+<h5 id="conditon部分方法">Conditon部分方法</h5>
+<pre><code class="language-java">void awaitUninterruptibly()	
+
+</code></pre>
+<p>造成当前线程在接到信号之前一直处于等待状态。被中断后不抛出异常，继续执行。</p>
+<p>这里注意，await()方法在中断时会抛出异常，而此方法中断相当于唤醒当前线程的信号，即在中断，signal()，signalAll()唤醒当前线程前一直处于等待状态。</p>
+<pre><code class="language-Java">boolean awaitUntil(Date deadline) throws InterruptedException
+
+</code></pre>
+<p>造成当前线程在接到信号、被中断或到达指定最后期限之前一直处于等待状态。 中断后抛出异常。</p>
+<h5 id="reentrantreadwritelock">ReentrantReadWriteLock</h5>
+<p>读写锁，与ReentrantLock不同的是，读写锁表示有两个锁，一个是读操作相关的锁，另一个是写相关操作的锁。多个读锁之间不互斥，读锁与写锁互斥，写锁和写锁互斥</p>
+<p>在某些不需要操作实例变量的方法中，可以使用读锁提高运行速度。</p>
+<pre><code>lock.readLock().lock();//获得读锁
+lock.readLock().unlock();//释放读锁
+lock.writeLock.lock();//获得写锁
+lock.writeLock().unlock();//释放读锁
+
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Java虚拟机]]></title>
         <id>https://GroundhogDaily.github.io/post/java-xu-ni-ji</id>
