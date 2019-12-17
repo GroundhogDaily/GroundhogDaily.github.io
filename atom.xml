@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://GroundhogDaily.github.io</id>
     <title>笔记</title>
-    <updated>2019-11-16T01:31:13.557Z</updated>
+    <updated>2019-12-17T06:27:20.832Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://GroundhogDaily.github.io"/>
     <link rel="self" href="https://GroundhogDaily.github.io/atom.xml"/>
@@ -10,6 +10,218 @@
     <logo>https://GroundhogDaily.github.io/images/avatar.png</logo>
     <icon>https://GroundhogDaily.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, 笔记</rights>
+    <entry>
+        <title type="html"><![CDATA[Java并发中级主题]]></title>
+        <id>https://GroundhogDaily.github.io/post/java-bing-fa-zhong-ji-zhu-ti</id>
+        <link href="https://GroundhogDaily.github.io/post/java-bing-fa-zhong-ji-zhu-ti">
+        </link>
+        <updated>2019-12-17T06:26:24.000Z</updated>
+        <content type="html"><![CDATA[<h4 id="同步工具类">同步工具类</h4>
+<ul>
+<li>
+<p>ConcurrentHashMap</p>
+<p>ConcurrentHashMap使用粒度更细的分段所来实现更大程度的共享，ConcurrentHashMap的实现中使用了一个包含16个锁的数组，每个锁保护所有散列桶的1/16，其中第N个散列桶由第（N mod 16）个锁来保护，好处是可以实现更高的并发性，但如果执行的操作需要加锁整个容器时，代价也会很大。</p>
+<p>ConcurrentHashMap与其他并发容器一起增强了 同步容器类：它们提供的迭代器不会抛出ConcurrentModificationException（<strong>大多数情况下，使用迭代器对容器进行迭代时，如果有其他线程修改了容器，hasNext和next会抛出异常</strong>）,因此不需要在迭代过程中对容器加锁。即它返回的迭代器具有弱一致性，允许并发的修改。</p>
+<p>因分段锁的特性，对于一些需要在整个Map上进行计算的方法，如size和isEmpty，这些方法的语义被略微减弱了，即返回的值是一个估计值而不是精确值，因为并没有同步。</p>
+<p>在ConcurrentHashMap中没有实现对Map加锁以提供独占访问，即获得Map的锁并不能阻止其他线程访问该Map。</p>
+<p>不允许将null作为键和值。</p>
+<p>相比于hashmap，ConcurrentHashMap多了额外的一些原子操作方法（都继承子AbstractMap）。</p>
+<pre><code class="language-Java">V putIfAbsent(K key,V value) //仅当k没有相应的映射值时才插入
+boolean remove(Object key,Object value)//仅当k被映射到v时才移除
+V replace(K key,V newValue)//仅当k被映射到某个值时才替换为newValue
+boolean replace(K key,V oldValue,V newValue)//仅当k被映射到oldValue时才替换为newValue
+</code></pre>
+</li>
+<li>
+<p>BlockingQueue</p>
+<p>阻塞队列提供了可阻塞的put和take方法，以及支持定时的offer和poll方法。</p>
+<p>BlockingQueue不接受null元素。</p>
+<p>BlockingQueue 实现主要用于生产者-使用者队列。</p>
+<pre><code class="language-Java">boolean add(E e)//添加元素，成功返回true，如果空间不足抛出IllegalStateException
+</code></pre>
+<pre><code class="language-Java">boolean offer(E e)//添加元素，成功返回true，空间不足返回false，当队列有容量限制时优先使用此方法
+</code></pre>
+<pre><code class="language-Java">void put(E e) throws InterruptedException//添加元素，空间不足则阻塞直到添加成功，可被中断（当前线程被中断）
+</code></pre>
+<pre><code class="language-Java">boolean offer(E e,long timeout,TimeUnit unit) throws InterruptedException
+//添加元素，在指定的时间内阻塞等待可用空间，可被中断
+</code></pre>
+<pre><code class="language-java">E take() throws InterruptedException//获取并移除队列的头部，如没有元素则阻塞，可被中断
+</code></pre>
+<pre><code class="language-Java">E poll(long timeout,TimeUnit unit) throws InterruptedException
+//获取并移除此队列的头部，在指定的等待时间前等待可用的元素（如果有必要）。 
+</code></pre>
+<p>综上，BlockingQueue提供了四种添加元素的方式，可以根据业务需求选择合适的方法。BlockingQueue共有六种实现，下面提供了个人的介绍和理解。</p>
+<p><strong>ArrayBlockingQueue</strong>:一个由数组支持的有界阻塞队列。此队列按  FIFO（先进先出）原则对元素进行排序。队列的<em>头部</em> 是在队列中存在时间最长的元素。队列的<em>尾部</em>  是在队列中存在时间最短的元素。新元素插入到队列的尾部，队列获取操作则是从队列头部开始获得元素。 可指定线程的访问策略，设置为true则按FIFO顺序访问线程（公平锁），默认false。此类及其迭代器实现了 Collection和 Iterator 接口的所有<em>可选</em> 方法，可以返回弱一致性的迭代器。</p>
+<p>ArrayBlockingQueue底层使用lock锁，生产者添加元素和消费者取出元素都是同一个锁。</p>
+<p><strong>LinkedBlockingQueue</strong>：一个基于已链接节点的、范围任意的 blocking queue。此队列按  FIFO（先进先出）排序元素。队列的<em>头部</em> 是在队列中时间最长的元素。队列的<em>尾部</em>  是在队列中时间最短的元素。新元素插入到队列的尾部，并且队列获取操作会获得位于队列头部的元素。默认容量等于Integer.MAX_VALUE，可指定容量大小。此类及其迭代器实现了 Collection和 Iterator 接口的所有<em>可选</em> 方法，可以返回弱一致性的迭代器。</p>
+<p>LinkedBlockingQueue在消费者和生产者方法中使用不同的lock锁，消费者和生产者可以并行运行。</p>
+<p><strong>PriorityBlockingQueue</strong>：一个无界阻塞队列，构造函数需指定初始容量。基于优先级的队列，线程获取锁的方式按照FIFO的顺序。另外，该队列不阻塞数据生产者，容量不足会一直扩容，直到OutOfMemoryError，但会阻塞数据消费者。生产者和消费者公用一个lock锁。底层使用数组。</p>
+<p><strong>DelayQueue</strong>：一个无界阻塞队列，只有在延迟期满时才能从中提取元素（存储的元素继承自Dalayed）</p>
+<p>。该队列插入数据不会阻塞，获取数据时有可能阻塞。生产者和消费者共用一个lock锁。</p>
+<p><strong>SynchronousQueue</strong> ：每个插入操作必须等待另一个线程的对应移除操作 ，反之亦然。同步队列没有任何内部容量，甚至连一个队列的容量都没有。不能在同步队列上进行  <code>peek</code>，因为仅在试图要移除元素时，该元素才存在；除非另一个线程试图移除某个元素，否则也不能（使用任何方法）插入元素；也不能迭代队列，因为其中没有元素可用于迭代。</p>
+</li>
+<li>
+<p>闭锁（CountDownLatch)</p>
+<p>一个同步辅助类，在完成一组正在其他线程中执行的操作之前，它允许一个或多个线程一直等待。</p>
+<p>该类需要在构造函数指定计数器的初始值，countDown方法会将计数器减一，而await方法则阻塞直到计数器的值为零。await方法可指定阻塞时间。可被中断。</p>
+<p>用法：</p>
+<ol>
+<li>确保某个计算在其需要的所有资源都被初始化后才继续执行</li>
+<li>确保某个服务在其依赖的所有服务都已经启动后才启动</li>
+<li>等待直到某个操作的所有参与者都就绪再继续执行</li>
+</ol>
+</li>
+<li>
+<p>Callable</p>
+<p>与runnable类似，不同的是，Callable可返回结果，而runnable不能。Callable通常与FutureTask一起使用，执行可返回结果的计算。</p>
+</li>
+<li>
+<p>FutureTask</p>
+<p>可取消的异步计算。<s>利用开始和取消计算的方法、查询计算是否完成的方法和获取计算结果的方法，此类提供了对 Future 的基本实现仅在计算完成时才能获取结果；如果计算尚未完成，则阻塞 <code>get</code> 方法。</s>（屁话，看不懂）。就是相比于runnable，FutureTask通过Callable实现了可以获得结果的run方法，而get方法在获得结果（run方法执行完）前会一直阻塞。一旦计算完成，就不能再重新开始或取消计算。</p>
+<p>可使用 <code>FutureTask</code> 包装 Callable'或  Runnable（返回null）对象。因为  <code>FutureTask</code> 实现了 <code>Runnable</code>，所以可将 <code>FutureTask</code> 提交给 Executor 执行。</p>
+<p>使用场景：</p>
+<ol>
+<li>
+<p>Future用于异步获取执行结果或者取消任务。</p>
+</li>
+<li>
+<p>在高并发场景下确保任务只执行一次。</p>
+</li>
+</ol>
+<pre><code class="language-java">//简单使用方式，在run方法执行完之前get方法处于阻塞状态
+private final FutureTask&lt;V&gt; future = new FutureTask(new Callable&lt;V&gt;(){
+    public V call() {
+        do something ...
+        return v;
+    }
+});
+//future实现了runnable接口，可以交给thread和executor异步执行
+private final Thread thread = new Thread(future);
+thread.start();
+
+ExecutorService executor = Executors.newCachedThreadPool();
+executor.submit(future);
+
+future.get();//这里要注意异常的处理，Callable抛出的异常会被封装成ExecutionException，然后从此抛出，应该要有具体对某类异常的处理方式
+</code></pre>
+<pre><code class="language-Java">V get() throws InterruptedException, ExecutionException//阻塞直到返回结果，可中断，也可以设置阻塞时间
+boolean cancel(boolean mayInterruptIfRunning)//取消任务的执行，具体详见文档
+</code></pre>
+</li>
+<li>
+<p>计数信号量（Counting Semaphore）</p>
+<p>信号量维护了一个许可集。如有必要，在许可可用前会阻塞每一个 <code>acquire()</code>，然后再获取该许可。每个  <code>release()</code> 添加一个许可，从而可能释放一个正在阻塞的获取者。</p>
+<p>计数信号量用来控制同时访问某个特定资源的操作数量，或者同时执行某个指定操作的数量。</p>
+<p>计数信号量还可以用来实现某种资源池，或者对容器施加边界（将任何一种容器变成有界阻塞容器）。</p>
+<p>许可需要在创建信号量时指定，也可指定线程阻塞后获得许可的策略，默认非公平，设置为ture则按FIFO顺序。</p>
+<p>Semaphore类主要有4类方法，都可以指定要获取（释放）的许可数量（方法重载）：</p>
+<pre><code class="language-java">void acquire() throws InterruptedException
+</code></pre>
+<p>从此信号量获取一个许可，没有可用许可则阻塞，直到获得许可或当前线程被中断。</p>
+<pre><code class="language-Java">void acquireUninterruptibly()
+</code></pre>
+<p>从此信号量获取一个许可，没有可用许可则阻塞，忽略中断，并在获得许可后设置中断状态。</p>
+<pre><code class="language-java">void release()
+</code></pre>
+<p>释放一个许可，将其返回给信号量。 这里注意，<strong>一个线程释放前，并不需要先获得许可</strong>。</p>
+<pre><code class="language-Java">boolean tryAcquire()
+</code></pre>
+<p>获取一个许可（如果提供了一个）并立即返回，其值为 true，将可用的许可数减 1。 如果没有可用的许可，则此方法立即返回并且值为 false。也可在指定时间内等待许可，超时返回false。</p>
+</li>
+<li>
+<p>栅栏（CyclicBarrier）</p>
+<p>栅栏类似与闭锁，它能阻塞一组线程直到某个事件发生，栅栏在释放后可以重用。</p>
+<p>简单来说构造方法指定要到达栅栏位置的线程数量N，而线程调用栅栏的await()方法阻塞，直到N个线程都执行到await方法，才允许继续执行。</p>
+<p><code>CyclicBarrier</code> 支持一个可选的 <code>Runnable</code> 命令，在一组线程中的最后一个线程到达之后（但在释放所有线程之前），该命令只在每个屏障点运行一次。即所有线程到达await方法后，执行该命令（由任意一个子线程执行一次）。</p>
+<pre><code class="language-java">//用法
+public class CycliBarrierTest{
+    private final CyclicBarrier barrier;
+    private final Worker[] workers;
+    
+    public CycliBarrierTest(int size){
+        this.barrier = new CyclicBarrier(size,new Runnable(){//可选参数Runnable
+            public void run(){
+                do something ...//在全部线程执行到await方法后要执行的语句，只执行一次
+            }
+        })；
+        this.workers = new Worker[size];
+    }
+    
+    private class Worker implemnets Runnable{
+        public void run(){
+            do something ...
+            try{
+                barrier.await();
+            } catch(InterruptedException e){
+                e.printStackTrace();
+            } catch (BrokenBarrierException e) {
+               e.printStackTrace();
+            }
+            do something ...
+        }
+    }
+    
+    public void start(){
+        for(int i=0;i &lt; workers.length;i++){
+            new Thread(workers[i]).start();
+        }
+    }
+}
+</code></pre>
+</li>
+<li>
+<p>闭锁和栅栏的区别：</p>
+<p>闭锁用于指定某些操作的开始时机，等待计数器为零才开始执行（一个服务执行完，计数器减一）。</p>
+<p>栅栏用于等待一组线程都执行到某个位置后才继续执行。</p>
+<p>栅栏指定等待的线程并不会执行完释放资源，即这些线程会因调用await方法阻塞。闭锁则利用计数器递减的方式，每个线程调用countdown方法并不会阻塞，线程有可能已经运行完成并且释放资源，而调用await方法的线程则等待计数器为零。</p>
+</li>
+<li>
+<p>Executor</p>
+<p>执行已提交的 <code>Runnable</code> 任务的对象。此接口提供一种将任务提交与每个任务将如何运行的机制（包括线程使用的细节、调度等）分离开来的方法。</p>
+</li>
+<li>
+<p>Executors</p>
+<p>创建线程池的工具类，可以通过调用Executors中的静态工厂方法来创建线程池。</p>
+<pre><code class="language-java">static ExecutorService newFixedThreadPool(int nThreads)
+</code></pre>
+<p>创建一个固定长度的线程池，每当提交一个任务时就创建一个线程，直到达到线程池的最大数量。</p>
+<pre><code class="language-java">static ExecutorService newCachedThreadPool()
+</code></pre>
+<p>创建一个可缓存的线程池，如果线程池的当前规模超过了处理需求时，那么将回收空闲的线程，而当需求增加时，则可以添加新的线程，线程池的规模不存在任何限制。</p>
+<pre><code class="language-java">static ExecutorService newSingleThreadExecutor()
+</code></pre>
+<p>单线程的Executor，他创建单个工作者线程来执行任务，如果线程异常结束，会创建另一个线程来代替。它能确保依照任务在队列中的顺序来执行。</p>
+<pre><code class="language-java">static ScheduledExecutorService newScheduledThreadPool(int corePoolSize)
+</code></pre>
+<p>创建一个固定长度的线程池，而且以延迟或定时的方式来执行任务。Timer类负责管理延迟任务，但存在缺陷。Timer在执行所有定时任务时只会创建一个线程，如果某个任务的执行时间过长，那么将破坏其他TimerTask的定时精确性，例如某个周期任务需要每10ms执行一次，另一个TimerTask需要执行40ms，那么这个周期任务便不能得到需要的效果。</p>
+</li>
+<li>
+<p>ExecutorService</p>
+<p>ExecutorService扩展了Executor接口，增加了生命周期管理的方法以及可为跟踪一个或多个异步任务执行状况而生成 Future 的方法。</p>
+<pre><code class="language-java">&lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task)
+</code></pre>
+<p>提交一个返回值的任务用于执行，返回一个表示任务的未决结果的 Future。该 Future 的 get 方法在成功完成时将会返回该任务的结果。</p>
+<pre><code class="language-java">&lt;T&gt; Future&lt;T&gt; submit(Runnable task, T result)
+</code></pre>
+<p>提交一个 Runnable 任务用于执行，并返回一个表示该任务的 Future。该 Future 的 get 方法在成功完成时将会返回给定的结果。</p>
+<pre><code class="language-java">Future&lt;?&gt; submit(Runnable task)
+</code></pre>
+<p>提交一个 Runnable 任务用于执行，并返回一个表示该任务的 Future。该 Future 的 get 方法在成功 完成时将会返回 null。</p>
+<pre><code class="language-java">boolean isShutdown()
+</code></pre>
+<p>如果此执行程序已关闭，则返回 true。</p>
+<pre><code class="language-java">void shutdown()
+</code></pre>
+<p>启动一次顺序关闭，执行以前提交的任务，但不接受新任务。如果已经关闭，则调用没有其他作用。</p>
+<pre><code class="language-java">List&lt;Runnable&gt; shutdownNow()
+</code></pre>
+<p>试图停止所有正在执行的活动任务，暂停处理正在等待的任务，并返回等待执行的任务列表。<br>
+无法保证能够停止正在处理的活动执行任务，但是会尽力尝试。</p>
+</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Java多线程基础]]></title>
         <id>https://GroundhogDaily.github.io/post/java-duo-xian-cheng-ji-chu</id>
@@ -50,29 +262,23 @@ Thread.currentThread().getName()
 </code></pre>
 <p>暂停当前正在执行的线程对象，并执行其他线程。即让出cpu资源，并处于就绪状态等待cpu资源。</p>
 <pre><code class="language-java">final void setPriority(int newPriority)
-
 </code></pre>
 <p>更改线程的优先级（1-10）。</p>
 <p>在Java中，线程优先级具有继承性，比如A线程启动B线程，则B线程的优先级与A是一样的。</p>
 <pre><code class="language-java">final int getPriority()
-
 </code></pre>
 <p>返回线程的优先级。</p>
 <pre><code class="language-java">final void join()
-
 </code></pre>
 <p>等待该线程终止，并释放锁。</p>
 <pre><code class="language-java">final wait void wait()
-
 </code></pre>
 <p>Object方法，使线程等待，将线程加入“预执行队列”中，并释放锁，只能在同步语句块中使用。</p>
 <p>为防止出现通知过早等问题，该方法需要在循环中使用，一般用while语句加上标识符。</p>
 <pre><code class="language-java">final void notify()
-
 </code></pre>
 <p>Object方法，唤醒在此对象监视器上等待的单个线程（随机唤醒一个），被唤醒的线程加入就绪队列，等待当前线程释放锁，必须在同步语句块中使用，</p>
 <pre><code class="language-java">final void notifyAll()
-
 </code></pre>
 <p>Object方法，唤醒在此对象监视器上等待的所有线程，必须在同步语句块中使用。</p>
 <p>上述三个方法可以实现线程间通信的功能，生产者与消费者则需用到notifyAll唤醒所有等待的线程，否则会产生循环等待的问题，即生产者唤醒生产者，消费者唤醒消费者。</p>
@@ -118,7 +324,8 @@ class Producer implements Runnable{
     
     public void run(){
         while(true){//根据具体业务而定
-            //发生中断时会抛出异常，提前结束等待（调用interrupt方法，中断当前线程），所以需要     		   //在出现这种情况时进行相应的处理，有时候业务需要提前结束等待。
+            //发生中断时会抛出异常，提前结束等待（调用interrupt方法，中断当前线程），所以需要     		   
+            //在出现这种情况时进行相应的处理，有时候业务需要提前结束等待。
             try{
             	person.produce();
         	}catch(InterruptedException e){
@@ -145,14 +352,12 @@ class Consumer implements Runnable{
         }
     }
 }
-
 </code></pre>
 <h4 id="通过管道进行线程间通信">通过管道进行线程间通信</h4>
 <pre><code class="language-Java">PipedInputStream（从输入流中读取数据） PipedOutputStream //字节流
 PipedReader PipedWriter //字符流
 //四个类都有connect方法，用于相互连接，一个线程通过PipedOutputStream或PipedWriter向流输入数据，另一个线程取数据
 //管道输入流包含一个缓冲区，可在缓冲区限定的范围内将读操作和写操作分离开。
-
 </code></pre>
 <h4 id="lock的使用显式锁">Lock的使用(显式锁)</h4>
 <h5 id="reentrantlock">ReentrantLock</h5>
@@ -172,7 +377,6 @@ public class Demo{
         }
     }
 }
-
 </code></pre>
 <h4 id="与lock关联的condition">与Lock关联的Condition</h4>
 <p>理解：conditon通过lock.newCondition()创建，实现了粒度更细的等待/通知模型。一个Lock对象可以创建多个Condition,而一个Condition可以和多个线程关联，实现了范围性的等待/通知。</p>
@@ -230,32 +434,26 @@ public class Demo{
         }
     }
 }
-
 </code></pre>
 <h5 id="公平锁和非公平锁">公平锁和非公平锁</h5>
 <p>锁Lock分为“公平锁”和“非公平锁”，公平锁表示线程获取锁的顺序是按照FIFO先进先出的顺序，非公平锁则是一种获取锁的抢占机制，随机获取锁。</p>
 <pre><code class="language-java">lock = new ReentrantLock(true)//设为公平锁，默认为false
-
 </code></pre>
 <h5 id="有条件的执行线程">有条件的执行线程</h5>
 <pre><code class="language-java"> boolean tryLock()
-
 </code></pre>
 <p>仅在调用时锁未被另一个线程保持的情况下，才获取该锁。 如果锁被另一个线程保持，则此方法将立即返回 false 值。 与lock()不同的是，他不会等待获取锁，而是直接返回false。</p>
 <pre><code class="language-java">boolean tryLock(long timeout,TimeUnit unit) throws InterruptedException
-
 </code></pre>
 <p>如果锁在给定等待时间内没有被另一个线程保持，且当前线程未被中断，则获取该锁。</p>
 <p>因为此方法是一个显式中断点，所以要优先考虑响应中断，而不是响应锁的普通获取或重入获取，或者报告所用的等待时间。</p>
 <p>理解：lock锁可实现有条件，有时间限制的获取锁，在中断情况下放弃执行后面的同步代码块，并抛出异常，在实现时可通过设置中断有条件的让一个线程是否执行同步代码。</p>
 <h5 id="conditon部分方法">Conditon部分方法</h5>
 <pre><code class="language-java">void awaitUninterruptibly()	
-
 </code></pre>
 <p>造成当前线程在接到信号之前一直处于等待状态。被中断后不抛出异常，继续执行。</p>
 <p>这里注意，await()方法在中断时会抛出异常，而此方法中断相当于唤醒当前线程的信号，即在中断，signal()，signalAll()唤醒当前线程前一直处于等待状态。</p>
 <pre><code class="language-Java">boolean awaitUntil(Date deadline) throws InterruptedException
-
 </code></pre>
 <p>造成当前线程在接到信号、被中断或到达指定最后期限之前一直处于等待状态。 中断后抛出异常。</p>
 <h5 id="reentrantreadwritelock">ReentrantReadWriteLock</h5>
@@ -265,7 +463,6 @@ public class Demo{
 lock.readLock().unlock();//释放读锁
 lock.writeLock.lock();//获得写锁
 lock.writeLock().unlock();//释放读锁
-
 </code></pre>
 ]]></content>
     </entry>

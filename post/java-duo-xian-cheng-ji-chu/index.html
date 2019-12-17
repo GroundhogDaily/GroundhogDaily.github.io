@@ -1,102 +1,64 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" >
+        <head>
+        <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no" />
+        <meta charset="utf-8">
+        <title>Java多线程基础 | 笔记</title>
+        <link rel="stylesheet" href="https://GroundhogDaily.github.io/styles/main.css">
+        <link rel="stylesheet" href="https://at.alicdn.com/t/font_1423691_1fcfxbwa79n.css">
+        <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+        <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+         <script src="https://cdn.bootcss.com/highlight.js/9.15.10/highlight.min.js"></script>
+         <script >hljs.initHighlightingOnLoad();</script>
 
-<title>Java多线程基础 | 笔记</title>
-<meta name="description" content="没有伞的孩子要努力奔跑">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://GroundhogDaily.github.io/favicon.ico?v=1573867790939">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
-<link rel="stylesheet" href="https://GroundhogDaily.github.io/styles/main.css">
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
-
-
-  </head>
-  <body>
-    <div id="app" class="main">
-
-      <div class="sidebar" :class="{ 'full-height': menuVisible }">
-  <div class="top-container" data-aos="fade-right">
-    <div class="top-header-container">
-      <a class="site-title-container" href="https://GroundhogDaily.github.io">
-        <img src="https://GroundhogDaily.github.io/images/avatar.png?v=1573867790939" class="site-logo">
-        <h1 class="site-title">笔记</h1>
-      </a>
-      <div class="menu-btn" @click="menuVisible = !menuVisible">
-        <div class="line"></div>
-      </div>
-    </div>
-    <div>
-      
-        
-          <a href="/" class="site-nav">
-            首页
-          </a>
-        
-      
-        
-          <a href="/archives" class="site-nav">
-            归档
-          </a>
-        
-      
-        
-          <a href="/tags" class="site-nav">
-            标签
-          </a>
-        
-      
-        
-          <a href="/post/about" class="site-nav">
-            关于
-          </a>
-        
-      
-    </div>
-  </div>
-  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
-    <div class="social-container">
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    </div>
-    <div class="site-description">
-      没有伞的孩子要努力奔跑
-    </div>
-    <div class="site-footer">
-      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://GroundhogDaily.github.io/atom.xml" target="_blank">RSS</a>
-    </div>
-  </div>
-</div>
-
-
-      <div class="main-container">
-        <div class="content-container" data-aos="fade-up">
-          <div class="post-detail">
-            <h2 class="post-title">Java多线程基础</h2>
-            <div class="post-date">2019-11-16</div>
-            
-            <div class="post-content">
-              <h4 id="使用多线程的方法">使用多线程的方法</h4>
+    </head>
+    <body>
+              <header class="header mdui-m-b-5">      
+            <div class="container  ">
+                <div class="index-title animated fadeInDown mdui-text-center mdui-text-color-white mdui-m-b-2" style="animation-delay: 0.2s"><a href="https://GroundhogDaily.github.io">笔记</a></div>
+                <div class="mdui-text-color-white animated fadeInDown mdui-text-center  mdui-m-b-3" style="animation-delay: 0.4s">没有伞的孩子要努力奔跑</div>
+           
+            <nav id="nav" class="mdui-text-center animated fadeInDown" style="animation-delay: 0.6s">
+                   
+                            <li><a href="/">首页</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="/archives">归档</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="/tags">标签</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                            <li><a href="/post/about">关于</a>
+                                <span class="nav-style top"></span>
+                                <span class="nav-style bottom"></span>
+                                <span class="nav-style left"></span>
+                                <span class="nav-style right"></span>
+                                </li>
+                    
+                  </nav>
+                </div>
+        </header>
+        <div class="mdui-container ">
+                <div class="mdui-row">
+                        <div class="mdui-col-md-8 mdui-col-offset-md-2 ">
+                                <article class="mdui-p-a-2 post animated fadeIn" style="animation-delay: 0.8s;animation-duration: 2s">
+                                    <div class="post-title  mdui-m-b-1">Java多线程基础</div>
+                                    <div class="mdui-typo-body-2 mdui-m-b-2" datetime="2019-11-16 09:28:57">2019-11-16 / 9 min read</div>
+                                    <div class="mdui-m-b-2 mdui-typo post-neirong"><h4 id="使用多线程的方法">使用多线程的方法</h4>
 <p>继承Thread类</p>
 <p>实现runnable接口</p>
 <h4 id="线程常用方法thread类和object类">线程常用方法(Thread类和Object类)</h4>
@@ -130,29 +92,23 @@ Thread.currentThread().getName()
 </code></pre>
 <p>暂停当前正在执行的线程对象，并执行其他线程。即让出cpu资源，并处于就绪状态等待cpu资源。</p>
 <pre><code class="language-java">final void setPriority(int newPriority)
-
 </code></pre>
 <p>更改线程的优先级（1-10）。</p>
 <p>在Java中，线程优先级具有继承性，比如A线程启动B线程，则B线程的优先级与A是一样的。</p>
 <pre><code class="language-java">final int getPriority()
-
 </code></pre>
 <p>返回线程的优先级。</p>
 <pre><code class="language-java">final void join()
-
 </code></pre>
 <p>等待该线程终止，并释放锁。</p>
 <pre><code class="language-java">final wait void wait()
-
 </code></pre>
 <p>Object方法，使线程等待，将线程加入“预执行队列”中，并释放锁，只能在同步语句块中使用。</p>
 <p>为防止出现通知过早等问题，该方法需要在循环中使用，一般用while语句加上标识符。</p>
 <pre><code class="language-java">final void notify()
-
 </code></pre>
 <p>Object方法，唤醒在此对象监视器上等待的单个线程（随机唤醒一个），被唤醒的线程加入就绪队列，等待当前线程释放锁，必须在同步语句块中使用，</p>
 <pre><code class="language-java">final void notifyAll()
-
 </code></pre>
 <p>Object方法，唤醒在此对象监视器上等待的所有线程，必须在同步语句块中使用。</p>
 <p>上述三个方法可以实现线程间通信的功能，生产者与消费者则需用到notifyAll唤醒所有等待的线程，否则会产生循环等待的问题，即生产者唤醒生产者，消费者唤醒消费者。</p>
@@ -198,7 +154,8 @@ class Producer implements Runnable{
     
     public void run(){
         while(true){//根据具体业务而定
-            //发生中断时会抛出异常，提前结束等待（调用interrupt方法，中断当前线程），所以需要     		   //在出现这种情况时进行相应的处理，有时候业务需要提前结束等待。
+            //发生中断时会抛出异常，提前结束等待（调用interrupt方法，中断当前线程），所以需要     		   
+            //在出现这种情况时进行相应的处理，有时候业务需要提前结束等待。
             try{
             	person.produce();
         	}catch(InterruptedException e){
@@ -225,14 +182,12 @@ class Consumer implements Runnable{
         }
     }
 }
-
 </code></pre>
 <h4 id="通过管道进行线程间通信">通过管道进行线程间通信</h4>
 <pre><code class="language-Java">PipedInputStream（从输入流中读取数据） PipedOutputStream //字节流
 PipedReader PipedWriter //字符流
 //四个类都有connect方法，用于相互连接，一个线程通过PipedOutputStream或PipedWriter向流输入数据，另一个线程取数据
 //管道输入流包含一个缓冲区，可在缓冲区限定的范围内将读操作和写操作分离开。
-
 </code></pre>
 <h4 id="lock的使用显式锁">Lock的使用(显式锁)</h4>
 <h5 id="reentrantlock">ReentrantLock</h5>
@@ -252,7 +207,6 @@ public class Demo{
         }
     }
 }
-
 </code></pre>
 <h4 id="与lock关联的condition">与Lock关联的Condition</h4>
 <p>理解：conditon通过lock.newCondition()创建，实现了粒度更细的等待/通知模型。一个Lock对象可以创建多个Condition,而一个Condition可以和多个线程关联，实现了范围性的等待/通知。</p>
@@ -310,32 +264,26 @@ public class Demo{
         }
     }
 }
-
 </code></pre>
 <h5 id="公平锁和非公平锁">公平锁和非公平锁</h5>
 <p>锁Lock分为“公平锁”和“非公平锁”，公平锁表示线程获取锁的顺序是按照FIFO先进先出的顺序，非公平锁则是一种获取锁的抢占机制，随机获取锁。</p>
 <pre><code class="language-java">lock = new ReentrantLock(true)//设为公平锁，默认为false
-
 </code></pre>
 <h5 id="有条件的执行线程">有条件的执行线程</h5>
 <pre><code class="language-java"> boolean tryLock()
-
 </code></pre>
 <p>仅在调用时锁未被另一个线程保持的情况下，才获取该锁。 如果锁被另一个线程保持，则此方法将立即返回 false 值。 与lock()不同的是，他不会等待获取锁，而是直接返回false。</p>
 <pre><code class="language-java">boolean tryLock(long timeout,TimeUnit unit) throws InterruptedException
-
 </code></pre>
 <p>如果锁在给定等待时间内没有被另一个线程保持，且当前线程未被中断，则获取该锁。</p>
 <p>因为此方法是一个显式中断点，所以要优先考虑响应中断，而不是响应锁的普通获取或重入获取，或者报告所用的等待时间。</p>
 <p>理解：lock锁可实现有条件，有时间限制的获取锁，在中断情况下放弃执行后面的同步代码块，并抛出异常，在实现时可通过设置中断有条件的让一个线程是否执行同步代码。</p>
 <h5 id="conditon部分方法">Conditon部分方法</h5>
 <pre><code class="language-java">void awaitUninterruptibly()	
-
 </code></pre>
 <p>造成当前线程在接到信号之前一直处于等待状态。被中断后不抛出异常，继续执行。</p>
 <p>这里注意，await()方法在中断时会抛出异常，而此方法中断相当于唤醒当前线程的信号，即在中断，signal()，signalAll()唤醒当前线程前一直处于等待状态。</p>
 <pre><code class="language-Java">boolean awaitUntil(Date deadline) throws InterruptedException
-
 </code></pre>
 <p>造成当前线程在接到信号、被中断或到达指定最后期限之前一直处于等待状态。 中断后抛出异常。</p>
 <h5 id="reentrantreadwritelock">ReentrantReadWriteLock</h5>
@@ -345,49 +293,88 @@ public class Demo{
 lock.readLock().unlock();//释放读锁
 lock.writeLock.lock();//获得写锁
 lock.writeLock().unlock();//释放读锁
-
 </code></pre>
+</div>
+                                    <div class="mdui-divider mdui-m-b-2"></div>
+                                    <div class="mdui-row-xs-2 post-fenye">
+                                       
+                                        <div class="mdui-col"> <div class="mdui-text-left"><a href="https://GroundhogDaily.github.io/post/java-bing-fa-zhong-ji-zhu-ti">Java并发中级主题</a></div></div>
+                                        
 
-            </div>
-            
-            
-              <div class="next-post">
-                <div class="next">下一篇</div>
-                <a href="https://GroundhogDaily.github.io/post/java-xu-ni-ji">
-                  <h3 class="post-title">
-                    Java虚拟机
-                  </h3>
-                </a>
-              </div>
-            
+                                        
+                                        <div class="mdui-col"><div class="mdui-text-right "><a href="https://GroundhogDaily.github.io/post/java-xu-ni-ji">Java虚拟机</a></div> </div>
+                                       
+                                      </div>
+                                   
+                                    <div class="mdui-divider mdui-m-t-2 mdui-m-b-2"></div>
+                                    
+                                     <script src="https://GroundhogDaily.github.io/media/scripts/Valine.min.js"></script>
+ <div class="comment"></div>
 
-            
+<script>
+      new Valine({
+            el: '.comment',
 
-          </div>
 
-        </div>
-      </div>
-    </div>
 
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-
-<script type="application/javascript">
-
-AOS.init();
-
-hljs.initHighlightingOnLoad()
-
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
-
+            path: window.location.pathname,
+            pageSize: 30,
+            avatar:'mm', 
+       })
+    </script> 
+<script>
+    if(window.location.hash){
+        var checkExist = setInterval(function() {
+           if ($(window.location.hash).length) {
+              $('html, body').animate({scrollTop: $(window.location.hash).offset().top-90}, 1000);
+              clearInterval(checkExist);
+           }
+        }, 100);
+    }
 </script>
+                                </article>
 
+                                    
+                        </div>
+                      </div>
+    
+                
 
-
-
-  </body>
+              </div>
+                    <footer class="footer mdui-m-t-5 mdui-text-center">
+               <nav class="social-links">
+                      <ul>
+                      
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      
+                           
+                      </ul>
+                    </nav>
+                  <div class="copyright">
+                      <p>Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> <br/> Theme <a href="https://github.com/alterfang/gridea-theme-song/">宋</a> by <a href="https://shanbu.fun/">山卜方</a> </p>
+                  </div>
+                  
+              </footer>
+    </body>
 </html>
