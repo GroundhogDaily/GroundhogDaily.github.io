@@ -2,18 +2,122 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://GroundhogDaily.github.io</id>
     <title>笔记</title>
-    <updated>2019-12-17T06:27:20.832Z</updated>
+    <updated>2020-08-07T07:06:28.720Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://GroundhogDaily.github.io"/>
     <link rel="self" href="https://GroundhogDaily.github.io/atom.xml"/>
     <subtitle>没有伞的孩子要努力奔跑</subtitle>
     <logo>https://GroundhogDaily.github.io/images/avatar.png</logo>
     <icon>https://GroundhogDaily.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2019, 笔记</rights>
+    <rights>All rights reserved 2020, 笔记</rights>
+    <entry>
+        <title type="html"><![CDATA[redis]]></title>
+        <id>https://GroundhogDaily.github.io/post/redis/</id>
+        <link href="https://GroundhogDaily.github.io/post/redis/">
+        </link>
+        <updated>2020-08-07T07:04:03.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="redis入门">redis入门</h3>
+<h4 id="数据结构">数据结构</h4>
+<ul>
+<li>
+<p>字符串类型</p>
+<pre><code>set key value
+get key
+incr key 当字符串是数字时递增，不是整数则报错
+incrby key increment 增加指定的整数，不是整数则报错
+decr key 递减，不是整数则报错
+decrby key increment 减少指定的整数，不是整数则报错
+incrbyfloat key increment 增加指定的双精度浮点数
+append key value 值末尾追加value,键不存在则将键的值设为value，返回追加后的字符串长度
+strlen key 返回值的长度
+mget key [key...]获取多个值
+mset key value[key value ...]设置多个键值
+另外还有其他对位操作的命令
+</code></pre>
+</li>
+<li>
+<p>散列类型(hash)</p>
+<figure data-type="image" tabindex="1"><img src="https://raw.githubusercontent.com/GroundhogDaily/PicGo/image-20200807102214699.png" alt="image-20200807102214699" loading="lazy"></figure>
+<pre><code>hset key field value 字段不存在时返回1(插入)，存在返回0(更新)
+hget key field 
+hmset key field value [field value...]
+hmget key field [field...]
+hgetall key
+hexists key field 判断字段是否存在，存在返回1，不存在返回0
+hsetnx key field value 不存在则赋值
+hincrby key field increment 增加指定的值，散列类型没有hincr命令
+hdel key field [field...] 删除指定的字段，返回删除的个数
+hkeys key 获取字段名
+hvals key 获取字段值
+hlen key 获取字段数量
+</code></pre>
+</li>
+<li>
+<p>列表类型(list)</p>
+<p>列表类型（list）可以存储一个有序的字符串列表，常用的操作是向列表两端添加元素， 或者获得列表的某一个片段。列表类型内部采用双向链表（double linked list）实现。</p>
+<pre><code>lpush key value1[value2...] 向列表左边增加元素，返回增加元素后列表的长度。先添加value1,顺序添加
+rpush key value[value...]
+lpop key
+rpop key
+hlen key 键不存在返回0，时间复杂度为O(1)
+lrange key start stop 返回索引从start到stop的元素，包含两端，起始为0.不删除元素。
+    例：LRANGE key -2 -1 支持负索引，&quot;−1&quot;表示最右边第一个元素，&quot;-2&quot;表示最右边第二个元素，依次类推
+    例：LRANGE key 0 -1  返回全部元素，
+lren key count value 会删除列表中前count个值为value的元素，返回值是实际删除的元素个数。
+    （1）当 count &gt; 0时 LREM 命令会从列表左边开始删除前 count 个值为 value的元素。
+    （2）当 count &lt; 0时 LREM 命令会从列表右边开始删除前|count|个值为 value 的元素。
+    （3）当 count = 0是 LREM命令会删除所有值为 value的元素。
+lindex key index 获得指定索引的元素值
+lset key index 设置指定索引的元素值
+ltrim key start end 删除指定索引范围之外的所有元素
+linsert key before/after pivot value 会在列表中从左到右查找值为 pivot 的元素，然后根据第二个参	数是BEFORE还是AFTER来决定将value插入到该元素的前面还是后面
+rpoplpush source destination 将元素从一个列表转到另一个列表,：先执行RPOP命令再执行LPUSH命令。		RPOPLPUSH命令会先从source列表类型键的右边弹出一个元素，然后将其加入到destination列表类型键的		左边，并返回这个元素的值，整个过程是原子的。
+</code></pre>
+</li>
+<li>
+<p>集合类型(set)</p>
+<p>在集合中的每个元素都是不同的，且没有顺序。一个集合类型（set）键可以存储至多232−1个字符串。</p>
+<figure data-type="image" tabindex="2"><img src="https://raw.githubusercontent.com/GroundhogDaily/PicGo/image-20200807112342858.png" alt="image-20200807112342858" loading="lazy"></figure>
+<pre><code>sadd key member [member...] 返回加入的元素个数，已存在的元素不添加
+srem key member [member...] 删除，返回删除的个数
+smembers key 返回集合中所有的元素
+sismember key member 判断元素是否在集合中，存在返回1，不存在返回0，个时间复杂度为O(1)
+sdiff key1 [key...] 差集，返回所有属于key1,不属于其他key的元素
+sinter key [key] 交集，返回每个key都包含的元素，不重复
+sunion key [key] 并集，返回所有key的元素，不重复
+scard key 获取集合中元素个数
+sdiffstore destination key1 [key...] SDIFFSTORE命令和SDIFF命令功能一样，唯一的区别就是前者不会直接	返回运算结果，而是将结果存储在destination键中。
+sinterstore destination key [key] 
+sunionstore destination key [key]
+srandmember key [count] 随机获取一个或多个元素
+    （1）当count为正数时，SRANDMEMBER会随机从集合里获得count个不重复的元素。如果count的值大于集合 		中的元素个数，则SRANDMEMBER会返回集合中的全部元素。
+    （2）当count为负数时，SRANDMEMBER会随机从集合里获得|count|个的元素，这些元素有可能相同
+spop key 从集合中随机弹出一个元素
+</code></pre>
+</li>
+<li>
+<p>有序集合类型(sorted set)</p>
+<p>在集合类型的基础上有序集合类型为集合中的每个元素都关联了一个分数，这使得我们 不仅可以完成插入、删除和判断元素是否存在等集合类型支持的操作，还能够获得分数最高 （或最低）的前N个元素、获得指定分数范围内的元素等与分数有关的操作。虽然集合中每 个元素都是不同的，但是它们的分数却可以相同。</p>
+<pre><code>zadd key score member [score member]如果该元素已经存在则会用新的分数替换原有的分数
+zrange key start stop [withscore] 按照元素分数从小到大的顺序返回索引从 start到		stop之间的所有元素（包含两端的元素）,ZRANGE命令与LRANGE命令十分相似，如索引都是从	 0开始，负数代表从后向前查找（−1表示最后一个元素）。如果需要同时获得元素的分数的话可	以在 ZRANGE命令的尾部加上 WITHSCORES 参数,的时间复杂度为O(log n+m)
+zrangebyscore key min max[withscores] [limit offset count]该命令按照元素分数		从小到大的顺序返回分数在min和max之间（包含min和max）的元素,如果希望分数范围不包含		端点值，可以在分数前加上“(”符号。min和max还支持无穷大，同ZADD命令一样，-inf和		+inf分别表示负无穷和正无穷。在本命令中 LIMIT offset count与 SQL 中的用法基本相	 同，即在获得的元素列表的基础上向后偏移offset个元素，并且只获取前count个元素。
+zincrby key increment member 增加某个元素的分数，返回更改后的分数
+zcard key 获得集合中元素的数量
+zcount key min max 获得指定分数范围内的元素个数
+zrem key member [member] 删除一个或多个元素，返回成功删除的元素数量
+zremrangebyrank key start stop 按照元素分数从小到大的顺序，删除指定排名范围内的元	素，返回删除的元素数量
+zremrangebyscore key min max 删除指定分数范围内的元素，并返回删除的元素数量
+zrank key member 按照元素分数从小到大的顺序获得指定的元素member的排名
+zrevrank key member 按照元素分数从大到小的顺序获得指定的元素member的排名
+</code></pre>
+</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Java并发中级主题]]></title>
-        <id>https://GroundhogDaily.github.io/post/java-bing-fa-zhong-ji-zhu-ti</id>
-        <link href="https://GroundhogDaily.github.io/post/java-bing-fa-zhong-ji-zhu-ti">
+        <id>https://GroundhogDaily.github.io/post/java-bing-fa-zhong-ji-zhu-ti/</id>
+        <link href="https://GroundhogDaily.github.io/post/java-bing-fa-zhong-ji-zhu-ti/">
         </link>
         <updated>2019-12-17T06:26:24.000Z</updated>
         <content type="html"><![CDATA[<h4 id="同步工具类">同步工具类</h4>
@@ -224,8 +328,8 @@ public class CycliBarrierTest{
     </entry>
     <entry>
         <title type="html"><![CDATA[Java多线程基础]]></title>
-        <id>https://GroundhogDaily.github.io/post/java-duo-xian-cheng-ji-chu</id>
-        <link href="https://GroundhogDaily.github.io/post/java-duo-xian-cheng-ji-chu">
+        <id>https://GroundhogDaily.github.io/post/java-duo-xian-cheng-ji-chu/</id>
+        <link href="https://GroundhogDaily.github.io/post/java-duo-xian-cheng-ji-chu/">
         </link>
         <updated>2019-11-16T01:28:57.000Z</updated>
         <content type="html"><![CDATA[<h4 id="使用多线程的方法">使用多线程的方法</h4>
@@ -468,8 +572,8 @@ lock.writeLock().unlock();//释放读锁
     </entry>
     <entry>
         <title type="html"><![CDATA[Java虚拟机]]></title>
-        <id>https://GroundhogDaily.github.io/post/java-xu-ni-ji</id>
-        <link href="https://GroundhogDaily.github.io/post/java-xu-ni-ji">
+        <id>https://GroundhogDaily.github.io/post/java-xu-ni-ji/</id>
+        <link href="https://GroundhogDaily.github.io/post/java-xu-ni-ji/">
         </link>
         <updated>2019-11-10T08:40:06.000Z</updated>
         <content type="html"><![CDATA[<h4 id="虚拟机内存划分">虚拟机内存划分</h4>
@@ -642,38 +746,6 @@ lock.writeLock().unlock();//释放读锁
 </ol>
 <p>由ClassLoader实现，负责加载用户类路径（classpath）上指定的类库，开发者可以直接使用。</p>
 <p>双亲委派模型的工作过程：如果一个类收到了类加载的请求，会首先把这个请求委派给父类加载器（使用组合关系来复用父加载器的代码），因此所有的加载请求都委派到顶层的启动类加载器，只有父类加载器无法完成这个加载请求，子加载器才会尝试自己去加载，这样保证了object类在程序中都是同一个类，保证了程序的稳定。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Hello Gridea]]></title>
-        <id>https://GroundhogDaily.github.io/post/hello-gridea</id>
-        <link href="https://GroundhogDaily.github.io/post/hello-gridea">
-        </link>
-        <updated>2018-12-11T16:00:00.000Z</updated>
-        <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-<!-- more -->
-<p><a href="https://github.com/getgridea/gridea">Github</a><br>
-<a href="https://gridea.dev/">Gridea 主页</a><br>
-<a href="http://fehey.com/">示例网站</a></p>
-<h2 id="特性">特性👇</h2>
-<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
-<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
-<p>🏷️  你可以对文章进行标签分组</p>
-<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
-<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
-<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
-<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
-<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
-<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
-<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
-<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
-<p>未来，它一定会成为你离不开的伙伴</p>
-<p>尽情发挥你的才华吧！</p>
-<p>😘 Enjoy~</p>
 ]]></content>
     </entry>
 </feed>
