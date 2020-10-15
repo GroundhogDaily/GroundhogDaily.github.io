@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://GroundhogDaily.github.io</id>
     <title>笔记</title>
-    <updated>2020-08-17T02:36:10.216Z</updated>
+    <updated>2020-10-15T08:34:27.924Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://GroundhogDaily.github.io"/>
     <link rel="self" href="https://GroundhogDaily.github.io/atom.xml"/>
@@ -10,6 +10,152 @@
     <logo>https://GroundhogDaily.github.io/images/avatar.png</logo>
     <icon>https://GroundhogDaily.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 笔记</rights>
+    <entry>
+        <title type="html"><![CDATA[OAuth2.0]]></title>
+        <id>https://GroundhogDaily.github.io/post/oauth20/</id>
+        <link href="https://GroundhogDaily.github.io/post/oauth20/">
+        </link>
+        <updated>2020-10-15T08:33:25.000Z</updated>
+        <content type="html"><![CDATA[<p><strong>开放授权</strong>（OAuth）是一个开放标准，允许用户让第三方应用访问该用户在某一网站上存储的私密的资源（如照片，视频，联系人列表），而无需将用户名和密码提供给第三方应用。</p>
+<p>OAuth允许用户提供一个令牌，而不是用户名和密码来访问他们存放在特定服务提供者的数据。每一个令牌授权一个特定的网站（例如，视频编辑网站)在特定的时段（例如，接下来的2小时内）内访问特定的资源（例如仅仅是某一相册中的视频）。这样，OAuth让用户可以授权第三方网站访问他们存储在另外服务提供者的某些特定信息，而非所有内容。</p>
+<p><strong>历史</strong>：OAuth开始于2006年11月，当时布莱恩·库克正在开发Twitter的OpenID实现。与此同时，社交书签网站Ma.gnolia需要一个解决方案允许使用OpenID的成员授权Dashboard访问他们的服务。这样库克、克里斯·梅西纳和来自Ma.gnolia的拉里·哈尔夫（Larry Halff）与戴维·雷科尔顿会面讨论在Twitter和Ma.gnolia API上使用OpenID进行委托授权。他们讨论得出结论，认为没有完成API访问委托的开放标准。</p>
+<p><strong>重大事件</strong>：2014年5月，新加坡南洋理工大学一位名叫王晶（Wang Jing）的数学系博士生，发现了OAuth和OpenID开源登录工具的&quot;隐蔽重定向漏洞&quot;。</p>
+<hr>
+<h5 id="访问流程">访问流程</h5>
+<h6 id="基本流程">基本流程</h6>
+<pre><code> +--------+                               +---------------+
+ |        |--(A)- Authorization Request -&gt;|   Resource    |
+ |        |        请求用户授权             |     Owner     |
+ |        |&lt;-(B)-- Authorization Grant ---|     用户       |
+ |        |        用户同意授权             +---------------+
+ |        |
+ |        |                               +---------------+
+ |        |--(C)-- Authorization Grant --&gt;| Authorization |
+ | Client |         请求访问令牌            |     Server    |
+ | 第三方  |&lt;-(D)----- Access Token -------|  授权服务器     |
+ |        |         颁发访问令牌            +---------------+
+ |        |
+ |        |                               +---------------+
+ |        |--(E)----- Access Token ------&gt;|    Resource   |
+ |        |       使用令牌申请资源           |     Server    |
+ |        |&lt;-(F)--- Protected Resource ---|   资源服务器    |
+ +--------+       返回授权的资源            +---------------+
+</code></pre>
+<h5 id="授权模式">授权模式</h5>
+<h6 id="客户端凭据许可">客户端凭据许可</h6>
+<p>客户端不经过用户授权，直接向服务器请求用户的资源，此过程对用户透明。</p>
+<h6 id="资源所有者密码凭据许可">资源所有者密码凭据许可</h6>
+<p>客户端使用用户的账号密码请求授权服务器，获取访问令牌，再通过访问令牌请求资源服务器，获取用户资源。</p>
+<h6 id="隐式许可">隐式许可</h6>
+<pre><code> +----------+
+ | Resource |
+ |  Owner   |用户
+ |          |
+ +----------+
+      ^
+      |
+     (B)
+ +----|-----+          Client Identifier     +---------------+
+ |         -+----(A)-- &amp; Redirection URI ---&gt;|               |
+ |  User-   |                                | Authorization |
+ |  Agent  -|----(B)-- User authenticates --&gt;|     Server    |授权服务器
+ |   浏览器  |                                |               |
+ |          |&lt;---(C)--- Redirection URI ----&lt;|               |
+ |          |          with Access Token     +---------------+
+ |          |            in Fragment
+ |          |                                +---------------+
+ |          |----(D)--- Redirection URI ----&gt;|   Web-Hosted  |
+ |          |          without Fragment      |     Client    |资源服务器
+ |          |                                |    Resource   |
+ |     (F)  |&lt;---(E)------- Script ---------&lt;|               |
+ |          |                                +---------------+
+ +-|--------+
+   |    |
+  (A)  (G) Access Token
+   |    |
+   ^    v
+ +---------+
+ |         |
+ |  Client |第三方
+ |         |
+ +---------+
+</code></pre>
+<p>（A）客户端将用户导向认证服务器。</p>
+<p>（B）用户决定是否给于客户端授权。</p>
+<p>（C）假设用户给予授权，认证服务器将用户导向客户端指定的&quot;重定向URI&quot;，并在URI的Hash部分包含了访问令牌。</p>
+<p>（D）浏览器向资源服务器发出请求，其中不包括上一步收到的Hash值。</p>
+<p>（E）资源服务器返回一个网页，其中包含的代码可以获取Hash值中的令牌。</p>
+<p>（F）浏览器执行上一步获得的脚本，提取出令牌。</p>
+<p>（G）浏览器将令牌发给客户端。</p>
+<h6 id="授权码许可">授权码许可</h6>
+<pre><code> +----------+   （A）第三方引导用户带着客户端id，请求范围，本地状态，重定向URI去请求授权
+ | Resource |   （B）授权服务器确认用户身份，用户确认是否授权	
+ |   Owner  |   （C）授权服务器根据URI重定向用户到第三方，并返回授权码和之前客户端提供的本地状态
+ |   用户    |   （D）客户端通过包含授权码的重定向URI向授权服务器请求访问令牌，客户端与授权服务端身份验证
+ +----------+   （E）授权服务器对客户端进行身份验证，验证授权代码，确保重定向URI与步骤C的URI一致，通过则返回访问令牌和刷新令
+      ^             牌
+      |
+     (B)           
+ +----|-----+          Client Identifier      +---------------+
+ |         -+----(A)-- &amp; Redirection URI ----&gt;|               |
+ |  User-   |                                 | Authorization |授权服务器
+ |  Agent  -+----(B)-- User authenticates ---&gt;|     Server    |
+ |  浏览器   |                                 |               |
+ |         -+----(C)-- Authorization Code ---&lt;|               |
+ +-|----|---+                                 +---------------+
+   |    |                                         ^      v
+  (A)  (C)                                        |      |
+   |    |                                         |      |
+   ^    v                                         |      |
+ +---------+                                      |      |
+ |         |&gt;---(D)-- Authorization Code ---------'      |
+ |  Client |          &amp; Redirection URI                  |
+ | 第三方   |                                             |
+ |         |&lt;---(E)----- Access Token -------------------'
+ +---------+       (w/ Optional Refresh Token)
+</code></pre>
+<p>经过上面的步骤，第三方就可以通过访问令牌获取用户的部分信息。</p>
+<hr>
+<h5 id="总结">总结</h5>
+<p>访问令牌（Access Token）：一个用户在一个第三方程序中有一个访问令牌，第三方依靠令牌获取用户信息，令牌时间一般比较短</p>
+<p>刷新令牌（Refresh Token）：一个用户在一个第三方程序中有一个刷新令牌，当访问令牌失效时，第三方用刷新令牌获取用户访问令牌，刷新令牌时间更久。</p>
+<p>客户端id（client_id）：唯一标识某个第三方</p>
+<p>客户端密码（client_secret）：用于服务端验证客户端</p>
+<p>授权码（code）：仅授权模式中存在，在获取访问令牌时标识上一步的授权，授权码存在时间短，最长十分钟，一般定义几秒钟，授权码仅一次有效，用完失效</p>
+<p>本地状态（state）：可防止跨站点请求伪造，授权过程要经过用户的浏览器，而第三方需要保证A和C过程是没有被中间篡改过，所以需要一个标识，通常通过cookie的哈希值实现（防止用户被替换）</p>
+<p>访问范围（scope）：用于用户指定第三方可访问的信息</p>
+<hr>
+<ol>
+<li>
+<p>访问令牌，刷新令牌，客户端密码，授权码在传输过程中基于tls加密</p>
+</li>
+<li>
+<p>为什么要有刷新令牌？访问令牌存在时间短，即便被劫持也可以限制攻击者滥用令牌的时间，而刷新令牌获取访问令牌时需要客户端密码，即便被劫持也不会出事。</p>
+</li>
+<li>
+<p>为什么需要授权码这一步，而不是直接第一步获取访问令牌？在获取访问令牌这个过程中，授权服务器必须知道用户id和客户端id以及对客户端验证，那么在第一步中，客户端引导用户重定向到授权服务器，这里经过了浏览器，而且返回时也需要经过浏览器重定向，所以客户端密码势必要通过浏览器转发，那么就会有泄漏的风险，而这一协议本身就是为了安全考虑，默认浏览器是不可信的。</p>
+<hr>
+</li>
+</ol>
+<h5 id="浙江农信">浙江农信</h5>
+<img src="C:%5CUsers%5Cchen%5CDesktop%5C%E5%8D%9A%E5%AE%A2%5C%E6%B5%99%E6%B1%9F%E5%86%9C%E4%BF%A1%5C%E6%8E%88%E6%9D%83%E7%95%8C%E9%9D%A2.png" alt="授权界面" />
+<figure data-type="image" tabindex="1"><img src="C:%5CUsers%5Cchen%5CDesktop%5C%E5%8D%9A%E5%AE%A2%5C%E6%B5%99%E6%B1%9F%E5%86%9C%E4%BF%A1%5C%E6%8E%88%E6%9D%83%E6%B5%81%E7%A8%8B.png" alt="" loading="lazy"></figure>
+<p><strong>OpenId</strong>:登录一个支持 OpenID 的网站非常简单（即便你是第一次访问这个网站也是一样）。只需要输入你注册好的 OpenID 用户名，然后你登录的网站会跳转到你的 OpenID 服务网站，在你的 OpenID 服务网站输入密码（或者其它需要填写的信息）验证通过后，你会回到登录的网站并且已经成功登录。OpenID 系统可以应用于所有需要身份验证的地方，既可以应用于单点登录系统，也可以用于共享敏感数据时的身份认证。用于认证，而OAuth是认证+授权。</p>
+<h6 id="流程">流程</h6>
+<ol>
+<li>第三方引导用户带着客户端id，请求范围，本地状态，重定向URI去请求授权</li>
+<li>授权服务器确认用户身份，用户确认是否授权</li>
+<li>授权服务器根据URI重定向用户到第三方，并返回授权码和之前客户端提供的本地状态</li>
+<li>浏览器带着授权码，客户端id和客户端摘要访问授权服务器，授权服务器返回访问令牌和刷新令牌，这一步有验证客户端身份</li>
+<li>浏览器带着访问令牌，刷新令牌，客户端id和请求范围访问授权服务器，授权服务器返回openId</li>
+<li>若访问令牌过期，则浏览器带着刷新令牌，客户端id和openId访问授权服务器，授权服务器返回访问令牌</li>
+</ol>
+<p>授权码（authCode）：填写第一步获取的authCode参数。</p>
+<p>访问令牌（accessToken）：接口调用凭证。</p>
+<p>openId：授权用户唯一标识。</p>
+<p>客户端摘要（clientSign）：用client_secret通过HMAC-SHA1算法计算refreshToken的摘要，作为此字段的值。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[redis]]></title>
         <id>https://GroundhogDaily.github.io/post/redis/</id>
